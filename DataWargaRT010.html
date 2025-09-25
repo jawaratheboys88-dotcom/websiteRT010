@@ -1,0 +1,1176 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Data Warga RT.010</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/lucide-v0.292.0/dist/lucide.min.js"></script>
+    <!-- html2pdf.js CDN for PDF export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        /* Custom color palette for the theme */
+        :root {
+            --color-primary: #1e3a8a; /* Dark Blue */
+            --color-secondary: #fff; /* White */
+            --color-accent-gold: #fbbf24; /* Gold */
+            --color-accent-orange: #f97316; /* Orange */
+        }
+        .bg-primary { background-color: var(--color-primary); }
+        .text-primary { color: var(--color-primary); }
+        .bg-accent-gold { background-color: var(--color-accent-gold); }
+        .bg-accent-orange { background-color: var(--color-accent-orange); }
+        .text-accent-gold { color: var-color-accent-gold; }
+        .text-accent-orange { color: var-color-accent-orange; }
+
+        /* Custom CSS for print view */
+        @media print {
+            body > *:not(.print-area) { display: none !important; }
+            .print-area { 
+                display: block !important; 
+                width: 100% !important; 
+                max-width: none !important;
+                margin: 0 !important; 
+                padding: 0 !important; 
+                box-shadow: none !important;
+            }
+            .print-area .no-print { display: none !important; }
+            .print-area .container { padding: 0 !important; }
+            .print-area h1, .print-area h2, .print-area h3 { color: #000 !important; }
+            .print-area table { border-collapse: collapse; width: 100%; }
+            .print-area th, .print-area td { border: 1px solid #000; padding: 8px; font-size: 12px; }
+            .print-area .bg-primary, .print-area .text-white { background-color: transparent !important; color: #000 !important; }
+            .print-area .shadow-lg, .print-area .rounded-xl, .print-area .shadow-md { box-shadow: none !important; border-radius: 0 !important; }
+            .print-area img { max-width: 100px !important; }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans text-gray-800">
+
+    <!-- Header & Navigation -->
+    <header class="bg-primary text-white shadow-lg fixed top-0 w-full z-50">
+        <div class="container mx-auto flex justify-between items-center py-4 px-6 md:px-8">
+            <div class="flex items-center space-x-2">
+                <img src="https://placehold.co/40x40/f97316/ffffff?text=RT" alt="RT Logo" class="h-10 w-10 rounded-full border-2 border-accent-gold">
+                <span class="text-3xl font-bold text-accent-gold">RT.010</span>
+                <span class="hidden sm:block text-2xl font-bold">Sistem Data Warga</span>
+            </div>
+            <nav class="hidden md:flex space-x-6">
+                <a href="#" class="nav-link" data-target="home">Home</a>
+                <a href="#" class="nav-link" data-target="data-penduduk">Data Penduduk</a>
+                <a href="#" class="nav-link" data-target="laporan">Laporan Tahunan</a>
+                <a href="#" class="nav-link" data-target="tentang">Tentang</a>
+                <button id="login-btn" class="bg-accent-orange text-white px-4 py-2 rounded-lg font-semibold hover:bg-orange-600 transition duration-300">Login Admin</button>
+            </nav>
+            <button id="menu-btn" class="md:hidden text-white focus:outline-none">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-menu"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
+            </button>
+        </div>
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-primary text-white shadow-inner pb-4 transition-all duration-300">
+            <a href="#" class="mobile-nav-link" data-target="home">Home</a>
+            <a href="#" class="mobile-nav-link" data-target="data-penduduk">Data Penduduk</a>
+            <a href="#" class="mobile-nav-link" data-target="laporan">Laporan Tahunan</a>
+            <a href="#" class="mobile-nav-link" data-target="tentang">Tentang</a>
+            <button id="mobile-login-btn" class="w-full text-left mobile-nav-link">Login Admin</button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="pt-24 pb-8 min-h-screen">
+        <!-- Real-time Clock Section -->
+        <div class="container mx-auto px-4 md:px-8 text-center text-lg md:text-xl font-medium text-gray-600 mb-6">
+            <p id="real-time-clock"></p>
+        </div>
+
+        <!-- Home Section -->
+        <section id="home" class="container mx-auto px-4 md:px-8 py-12 page-section">
+            <div class="bg-white rounded-xl shadow-lg p-8">
+                <h1 class="text-3xl md:text-4xl font-bold text-primary mb-4">Selamat Datang di Portal RT.010 RW.04</h1>
+                <p class="text-lg text-green-600 mb-6">( KAMPUNG BARU SUKABUMI SELATAN KEBON JERUK JAKARTA BARAT )</p>
+                <p class="text-lg text-gray-600 mb-6">Portal ini menyediakan informasi seputar data penduduk dan laporan tahunan terkini untuk warga RT.010.</p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+                    <div class="bg-blue-100 p-6 rounded-lg shadow-md text-center">
+                        <span class="text-4xl font-bold text-primary" id="total-penduduk-stat"></span>
+                        <p class="text-gray-600">Total Penduduk</p>
+                    </div>
+                    <div class="bg-blue-100 p-6 rounded-lg shadow-md text-center">
+                        <span class="text-4xl font-bold text-primary" id="total-kk-stat"></span>
+                        <p class="text-gray-600">Total KK</p>
+                    </div>
+                    <div class="bg-blue-100 p-6 rounded-lg shadow-md text-center">
+                        <span class="text-4xl font-bold text-primary" id="laki-laki-stat"></span>
+                        <p class="text-gray-600">Laki-laki</p>
+                    </div>
+                    <div class="bg-blue-100 p-6 rounded-lg shadow-md text-center">
+                        <span class="text-4xl font-bold text-primary" id="perempuan-stat"></span>
+                        <p class="text-gray-600">Perempuan</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Data Penduduk Section -->
+        <section id="data-penduduk" class="container mx-auto px-4 md:px-8 py-12 hidden page-section">
+            <div class="bg-white rounded-xl shadow-lg p-8 print-area">
+                <div class="flex flex-col md:flex-row justify-between items-center mb-6 no-print">
+                    <h2 class="text-3xl font-bold text-primary mb-4 md:mb-0">Data Penduduk RT.010</h2>
+                    <div class="relative w-full md:w-auto">
+                        <input type="text" id="search-input" placeholder="Cari Nama / NIK..." class="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                    </div>
+                </div>
+                
+                <div class="overflow-x-auto rounded-lg shadow-md border border-gray-200">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-primary text-white">
+                            <tr>
+                                <th class="px-6 py-3 text-left font-bold uppercase tracking-wider rounded-tl-lg">No.</th>
+                                <th class="px-6 py-3 text-left font-bold uppercase tracking-wider">No. KK</th>
+                                <th class="px-6 py-3 text-left font-bold uppercase tracking-wider">Nama</th>
+                                <th class="px-6 py-3 text-left font-bold uppercase tracking-wider">NIK</th>
+                                <th class="px-6 py-3 text-left font-bold uppercase tracking-wider">Alamat</th>
+                                <th class="px-6 py-3 text-left font-bold uppercase tracking-wider">Jenis Kelamin</th>
+                                <th class="px-6 py-3 text-left font-bold uppercase tracking-wider">Status Hubungan</th>
+                                <th class="px-6 py-3 text-left font-bold uppercase tracking-wider">Tanggal Dibuat</th>
+                            </tr>
+                        </thead>
+                        <tbody id="penduduk-table-body" class="bg-white divide-y divide-gray-200">
+                            <!-- Data populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+                <div id="pagination" class="flex justify-center mt-6 space-x-2 no-print">
+                    <!-- Pagination buttons generated here -->
+                </div>
+            </div>
+        </section>
+ 
+        <!-- Laporan Tahunan Section -->
+        <section id="laporan" class="container mx-auto px-4 md:px-8 py-12 hidden page-section">
+            <div class="bg-white card p-8">
+                <div class="flex flex-col sm:flex-row justify-between items-center mb-6 no-print">
+                    <h2 class="text-2xl font-bold text-primary">Laporan Data Penduduk Per Tahun</h2>
+                </div>
+                <div class="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-4 mb-8 no-print">
+                    <div class="w-full sm:w-auto">
+                        <label for="year-select" class="sr-only">Pilih Tahun:</label>
+                        <div class="relative">
+                            <select id="year-select" class="block w-full px-4 py-3 text-lg bg-white border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-300 ease-in-out cursor-pointer appearance-none">
+                            </select>
+                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-700">
+                                <svg class="h-6 w-6 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15 9.707l-1.414-1.414L10 12.586 6.414 9l-1.414 1.414z"/></svg>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="report-action-buttons" class="flex space-x-2 w-full sm:w-auto justify-center hidden">
+                        <button id="print-laporan-btn" class="bg-yellow-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-yellow-700 transition duration-300 flex items-center justify-center space-x-2 w-1/2 sm:w-auto">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-printer"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect width="12" height="8" x="6" y="14"/></svg>
+                            <span>Cetak</span>
+                        </button>
+                        <button id="export-report-btn" class="bg-red-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-red-700 transition duration-300 flex items-center justify-center space-x-2 w-1/2 sm:w-auto">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-text"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>
+                            <span>Ekspor</span>
+                        </button>
+                    </div>
+                </div>
+                <main id="report-container" class="report-content p-6 bg-gray-50 rounded-lg shadow-inner transition-all duration-500 ease-in-out">
+                    <p class="text-center text-gray-500 text-lg">Pilih tahun dari menu di atas untuk menampilkan laporan tahunan.</p>
+                </main>
+            </div>
+        </section>
+
+        <!-- Tentang Section -->
+        <section id="tentang" class="container mx-auto px-4 md:px-8 py-12 hidden page-section">
+            <div class="bg-white rounded-xl shadow-lg p-8">
+                <h2 class="text-3xl font-bold text-primary mb-4">Tentang RT.010</h2>
+                <p class="text-lg text-gray-600 mb-4">RT.010 adalah bagian dari Kelurahan Sukabumi Selatan yang berkomitmen untuk menciptakan lingkungan yang harmonis dan Rukun. Wilayah RT.010 ini mencakup 4 Jalan : Jalan Panjang, Jalan KH.Tohir, Jalan Pahlawan, dan Gang Haji.Raidi.</p>
+                <p class="text-gray-600">Sistem Data Warga ini dikembangkan untuk mempermudah pengelolaan data penduduk RT.010.</p>
+                <div class="w-full text-center mt-8"><span class="text-xl text-primary">KAMPUNG BARU GG. H. RAIDI RT.010 RW.04 SUKABUMI SELATAN KEBON JERUK JAKARTA BARAT</span></div>
+            </div>
+        </section>
+
+        <!-- Admin Dashboard Section -->
+        <section id="admin-dashboard" class="container mx-auto px-4 md:px-8 py-12 hidden page-section">
+            <div class="bg-white rounded-xl shadow-lg p-8">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-3xl font-bold text-primary">Dashboard Admin</h2>
+                    <button id="logout-btn" class="bg-gray-400 text-white px-4 py-2 rounded-lg font-semibold hover:bg-gray-500 transition duration-300">Logout</button>
+                </div>
+                <p class="mb-6 text-gray-600">Selamat datang, Admin RT.010! Anda dapat mengelola data di bawah ini.</p>
+                
+                <!-- Laporan Management -->
+                <h3 class="text-2xl font-bold text-primary mb-4">Manajemen Laporan Tahunan</h3>
+                <div class="flex flex-wrap space-x-2 space-y-2 sm:space-y-0 sm:flex-nowrap mb-4">
+                    <button id="add-report-btn" class="bg-green-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-green-700 transition duration-300 w-full sm:w-auto">Tambah Laporan</button>
+                </div>
+                <div class="overflow-x-auto rounded-lg shadow-md border border-gray-200 mb-8">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-primary text-white">
+                            <tr>
+                                <th class="px-6 py-3 text-left font-bold uppercase rounded-tl-lg">Tahun</th>
+                                <th class="px-6 py-3 text-left font-bold uppercase">Total Penduduk</th>
+                                <th class="px-6 py-3 text-left font-bold uppercase">Total KK</th>
+                                <th class="px-6 py-3 text-left font-bold uppercase">Laki-laki</th>
+                                <th class="px-6 py-3 text-left font-bold uppercase">Perempuan</th>
+                                <th class="px-6 py-3 text-left font-bold uppercase rounded-tr-lg">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-reports-table-body" class="bg-white divide-y divide-gray-200">
+                            <!-- Data populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Data Management -->
+                <h3 class="text-2xl font-bold text-primary mb-4">Manajemen Data Penduduk</h3>
+                <div class="flex flex-wrap space-x-2 space-y-2 sm:space-y-0 sm:flex-nowrap mb-4">
+                    <button id="tambah-data-btn" class="bg-primary text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-800 transition duration-300 w-full sm:w-auto">Tambah Data Baru</button>
+                    <button id="print-data-btn" class="bg-yellow-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-yellow-700 transition duration-300 flex items-center justify-center space-x-2 w-full sm:w-auto">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-printer"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect width="12" height="8" x="6" y="14"/></svg>
+                        <span>Cetak Data</span>
+                    </button>
+                    <button id="export-pdf-btn" class="bg-red-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-red-700 transition duration-300 flex items-center justify-center space-x-2 w-full sm:w-auto">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-text"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>
+                        <span>Ekspor PDF</span>
+                    </button>
+                </div>
+                <div class="overflow-x-auto rounded-lg shadow-md border border-gray-200">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-primary text-white">
+                            <tr>
+                                <th class="px-6 py-3 text-left font-bold uppercase rounded-tl-lg">No.</th>
+                                <th class="px-6 py-3 text-left font-bold uppercase">No. KK</th>
+                                <th class="px-6 py-3 text-left font-bold uppercase">Nama</th>
+                                <th class="px-6 py-3 text-left font-bold uppercase">NIK</th>
+                                <th class="px-6 py-3 text-left font-bold uppercase">Alamat</th>
+                                <th class="px-6 py-3 text-left font-bold uppercase">Jenis Kelamin</th>
+                                <th class="px-6 py-3 text-left font-bold uppercase">Status Hubungan</th>
+                                <th class="px-6 py-3 text-left font-bold uppercase">Tanggal Dibuat</th>
+                                <th class="px-6 py-3 text-left font-bold uppercase rounded-tr-lg">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-table-body" class="bg-white divide-y divide-gray-200">
+                            <!-- Data populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Modal Admin (Simulasi) -->
+                <div id="add-edit-modal" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center hidden">
+                    <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-lg">
+                        <h4 id="modal-title" class="text-xl font-bold mb-4">Tambah Data Baru</h4>
+                        <form id="data-form">
+                            <input type="hidden" id="form-id">
+                            <div class="mb-4">
+                                <label for="form-nama" class="block text-gray-700">Nama</label>
+                                <input type="text" id="form-nama" class="w-full mt-1 p-2 border rounded-lg" required>
+                            </div>
+                            <div class="mb-4">
+                                <label for="form-nik" class="block text-gray-700">NIK (16 digit)</label>
+                                <input type="text" id="form-nik" class="w-full mt-1 p-2 border rounded-lg" pattern="[0-9]{16}" maxlength="16" title="NIK harus 16 digit angka" required>
+                            </div>
+                            <div class="mb-4">
+                                <label for="form-kk" class="block text-gray-700">Nomor KK (16 digit)</label>
+                                <input type="text" id="form-kk" class="w-full mt-1 p-2 border rounded-lg" pattern="[0-9]{16}" maxlength="16" title="Nomor KK harus 16 digit angka" required>
+                            </div>
+                            <div class="mb-4">
+                                <label for="form-alamat" class="block text-gray-700">Alamat</label>
+                                <input type="text" id="form-alamat" class="w-full mt-1 p-2 border rounded-lg" required>
+                            </div>
+                            <div class="mb-4">
+                                <label for="form-gender" class="block text-gray-700">Jenis Kelamin</label>
+                                <select id="form-gender" class="w-full mt-1 p-2 border rounded-lg" required>
+                                    <option value="Laki-laki">Laki-laki</option>
+                                    <option value="Perempuan">Perempuan</option>
+                                </select>
+                            </div>
+                            <div class="mb-4">
+                                <label for="form-status-hubungan" class="block text-gray-700">Status Hubungan</label>
+                                <select id="form-status-hubungan" class="w-full mt-1 p-2 border rounded-lg" required>
+                                    <option value="Kepala Keluarga">Kepala Keluarga</option>
+                                    <option value="Istri">Istri</option>
+                                    <option value="Anak">Anak</option>
+                                    <option value="Cucu">Cucu</option>
+                                    <option value="Lainnya">Lainnya</option>
+                                </select>
+                            </div>
+                            <div class="flex justify-end space-x-2">
+                                <button type="button" id="cancel-form-btn" class="bg-gray-300 px-4 py-2 rounded-lg">Batal</button>
+                                <button type="submit" class="bg-primary text-white px-4 py-2 rounded-lg">Simpan</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Laporan Modal -->
+                <div id="report-modal" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center hidden">
+                    <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-sm">
+                        <h4 id="report-modal-title" class="text-xl font-bold mb-4">Tambah Laporan Tahunan</h4>
+                        <form id="report-form">
+                            <div class="mb-4">
+                                <label for="report-year" class="block text-gray-700">Tahun</label>
+                                <select id="report-year" class="w-full mt-1 p-2 border rounded-lg" required>
+                                    <!-- Options will be populated by JavaScript -->
+                                </select>
+                            </div>
+                            <div class="mb-4">
+                                <label for="report-total-penduduk" class="block text-gray-700">Total Penduduk</label>
+                                <input type="number" id="report-total-penduduk" class="w-full mt-1 p-2 border rounded-lg" required min="0">
+                            </div>
+                            <div class="mb-4">
+                                <label for="report-total-kk" class="block text-gray-700">Total KK</label>
+                                <input type="number" id="report-total-kk" class="w-full mt-1 p-2 border rounded-lg" required min="0">
+                            </div>
+                            <div class="mb-4">
+                                <label for="report-laki-laki" class="block text-gray-700">Jumlah Laki-laki</label>
+                                <input type="number" id="report-laki-laki" class="w-full mt-1 p-2 border rounded-lg" required min="0">
+                            </div>
+                            <div class="mb-4">
+                                <label for="report-perempuan" class="block text-gray-700">Jumlah Perempuan</label>
+                                <input type="number" id="report-perempuan" class="w-full mt-1 p-2 border rounded-lg" required min="0">
+                            </div>
+                            <div class="flex justify-end space-x-2">
+                                <button type="button" id="cancel-report-btn" class="bg-gray-300 px-4 py-2 rounded-lg">Batal</button>
+                                <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded-lg">Simpan Laporan</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-primary text-white py-6">
+        <div class="container mx-auto px-4 md:px-8 text-center">
+            <p>&copy; 2025 Portal RT.010. Hak Cipta Dilindungi.</p>
+        </div>
+    </footer>
+
+    <!-- Custom Alert Modal -->
+    <div id="custom-alert" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center hidden">
+        <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-sm">
+            <h4 class="text-xl font-bold mb-4">Pesan</h4>
+            <p id="alert-message" class="text-gray-700 mb-4"></p>
+            <div class="flex justify-end space-x-2">
+                <button id="alert-ok-btn" class="bg-primary text-white px-4 py-2 rounded-lg">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Password Modal -->
+    <div id="password-modal" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center hidden">
+        <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-sm">
+            <h4 class="text-xl font-bold mb-4">Login Admin</h4>
+            <p class="text-gray-700 mb-4">Masukkan kata sandi admin:</p>
+            <input type="password" id="admin-password-input" class="w-full mt-1 p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+            <div class="flex justify-end space-x-2 mt-4">
+                <button type="button" id="password-cancel-btn" class="bg-gray-300 px-4 py-2 rounded-lg">Batal</button>
+                <button type="button" id="password-submit-btn" class="bg-primary text-white px-4 py-2 rounded-lg">Masuk</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Delete Confirmation Modal -->
+    <div id="confirm-delete-modal" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center hidden">
+        <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-sm">
+            <h4 class="text-xl font-bold text-red-600 mb-4">Konfirmasi Hapus</h4>
+            <p class="text-gray-700 mb-4">Apakah Anda yakin ingin menghapus data ini? Aksi ini tidak dapat dibatalkan.</p>
+            <div class="flex justify-end space-x-2">
+                <button id="cancel-delete-btn" class="bg-gray-300 px-4 py-2 rounded-lg">Batal</button>
+                <button id="confirm-delete-btn" class="bg-red-600 text-white px-4 py-2 rounded-lg">Hapus</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PDF Loading Modal -->
+    <div id="pdf-loading-modal" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center hidden">
+        <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-xs text-center">
+            <div class="animate-spin rounded-full h-12 w-12 border-4 border-t-primary border-r-primary border-b-primary border-l-white mx-auto mb-4"></div>
+            <p class="text-gray-700 font-semibold">Membuat PDF, tunggu sebentar...</p>
+        </div>
+    </div>
+
+    <script>
+        // Initial data as fallback if localStorage is empty
+        const initialPendudukData = [
+            { id: 1, nama: "Budi Santoso", nik: "3273010101900001", kk: "3273010101900001", alamat: "Jl. Merdeka No. 1", statusHubungan: "Kepala Keluarga", gender: "Laki-laki", created_at: "2024-05-15 10:00:00" },
+            { id: 2, nama: "Ani Permata", nik: "3273010101920002", kk: "3273010101900001", alamat: "Jl. Merdeka No. 1", statusHubungan: "Istri", gender: "Perempuan", created_at: "2024-05-15 10:01:00" },
+            { id: 3, nama: "Joko Widodo", nik: "3273010202850003", kk: "3273010202850003", alamat: "Jl. Diponegoro No. 5", statusHubungan: "Kepala Keluarga", gender: "Laki-laki", created_at: "2024-05-15 10:02:00" },
+            { id: 4, nama: "Siti Rahmawati", nik: "3273010303980004", kk: "3273010303980004", alamat: "Jl. Sudirman No. 10", statusHubungan: "Kepala Keluarga", gender: "Perempuan", created_at: "2024-05-15 10:03:00" },
+            { id: 5, nama: "Andi Wijaya", nik: "3273010404750005", kk: "3273010404750005", alamat: "Jl. A. Yani No. 15", statusHubungan: "Kepala Keluarga", gender: "Laki-laki", created_at: "2024-05-15 10:04:00" },
+            { id: 6, nama: "Dewi Lestari", nik: "3273010505050006", kk: "3273010505050006", alamat: "Jl. Mawar No. 20", statusHubungan: "Kepala Keluarga", gender: "Perempuan", created_at: "2024-05-15 10:05:00" },
+            { id: 7, nama: "Dodi Prasetyo", nik: "3273010606100007", kk: "3273010606100007", alamat: "Jl. Melati No. 25", statusHubungan: "Kepala Keluarga", gender: "Laki-laki", created_at: "2024-05-15 10:06:00" },
+            { id: 8, nama: "Fitriani", nik: "3273010707600008", kk: "3273010707600008", alamat: "Jl. Anggrek No. 30", statusHubungan: "Kepala Keluarga", gender: "Perempuan", created_at: "2024-05-15 10:07:00" },
+            { id: 9, nama: "Putri Kusuma", nik: "3273010808020009", kk: "3273010808020009", alamat: "Jl. Kamboja No. 35", statusHubungan: "Kepala Keluarga", gender: "Perempuan", created_at: "2024-05-15 10:08:00" },
+            { id: 10, nama: "Bayu Adi", nik: "3273010909150010", kk: "3273010909150010", alamat: "Jl. Cendana No. 40", statusHubungan: "Kepala Keluarga", gender: "Laki-laki", created_at: "2024-05-15 10:09:00" },
+            { id: 11, nama: "Indah Sari", nik: "3273010101920011", kk: "3273010101900001", alamat: "Jl. Merdeka No. 1", statusHubungan: "Anak", gender: "Perempuan", created_at: "2024-05-15 10:10:00" }
+        ];
+
+        const initialReportData = [
+            { year: 2023, totalPenduduk: 55, totalKK: 20, lakiLaki: 30, perempuan: 25 },
+            { year: 2024, totalPenduduk: 60, totalKK: 22, lakiLaki: 32, perempuan: 28 }
+        ];
+
+        // Global state variables
+        let currentPage = 1;
+        const rowsPerPage = 5;
+        let pendudukData = [];
+        let filteredData = [];
+        let reportData = [];
+        let isEditing = false;
+        let currentEditId = null;
+
+        // --- Data Persistence (localStorage) ---
+        function getPendudukData() {
+            try {
+                const storedData = localStorage.getItem('pendudukData');
+                if (storedData) {
+                    return JSON.parse(storedData);
+                }
+            } catch (error) {
+                console.error("Failed to load resident data from localStorage:", error);
+            }
+            return initialPendudukData;
+        }
+
+        function savePendudukData(data) {
+            try {
+                localStorage.setItem('pendudukData', JSON.stringify(data));
+            } catch (error) {
+                console.error("Failed to save resident data to localStorage:", error);
+            }
+        }
+        
+        function getReportData() {
+            try {
+                const storedData = localStorage.getItem('reportData');
+                if (storedData) {
+                    return JSON.parse(storedData);
+                }
+            } catch (error) {
+                console.error("Failed to load report data from localStorage:", error);
+            }
+            return initialReportData;
+        }
+
+        function saveReportData(data) {
+            try {
+                localStorage.setItem('reportData', JSON.stringify(data));
+            } catch (error) {
+                console.error("Failed to save report data to localStorage:", error);
+            }
+        }
+
+        // --- DOM Elements ---
+        const pageSections = document.querySelectorAll('.page-section');
+        const navLinks = document.querySelectorAll('.nav-link, .mobile-nav-link');
+        const loginBtn = document.getElementById('login-btn');
+        const mobileLoginBtn = document.getElementById('mobile-login-btn');
+        const logoutBtn = document.getElementById('logout-btn');
+        const searchInput = document.getElementById('search-input');
+        const pendudukTableBody = document.getElementById('penduduk-table-body');
+        const paginationContainer = document.getElementById('pagination');
+        const adminTableBody = document.getElementById('admin-table-body');
+        const adminReportsTableBody = document.getElementById('admin-reports-table-body');
+        const addEditModal = document.getElementById('add-edit-modal');
+        const addDataBtn = document.getElementById('tambah-data-btn');
+        const cancelFormBtn = document.getElementById('cancel-form-btn');
+        const form = document.getElementById('data-form');
+        const mobileMenuBtn = document.getElementById('menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        
+        // Report Elements
+        const yearSelect = document.getElementById('year-select');
+        const reportContainer = document.getElementById('report-container');
+        const addReportBtn = document.getElementById('add-report-btn');
+        const reportModal = document.getElementById('report-modal');
+        const reportForm = document.getElementById('report-form');
+        const cancelReportBtn = document.getElementById('cancel-report-btn');
+        const printLaporanBtn = document.getElementById('print-laporan-btn');
+        const exportReportBtn = document.getElementById('export-report-btn');
+
+        // Resident Data Elements
+        const printDataBtn = document.getElementById('print-data-btn');
+        const exportPdfBtn = document.getElementById('export-pdf-btn');
+
+        const modalTitle = document.getElementById('modal-title');
+        const realTimeClock = document.getElementById('real-time-clock');
+
+        // Form Elements
+        const formId = document.getElementById('form-id');
+        const formNama = document.getElementById('form-nama');
+        const formNik = document.getElementById('form-nik');
+        const formKk = document.getElementById('form-kk');
+        const formAlamat = document.getElementById('form-alamat');
+        const formGender = document.getElementById('form-gender');
+        const formStatusHubungan = document.getElementById('form-status-hubungan');
+
+
+        // Modal Elements
+        const customAlert = document.getElementById('custom-alert');
+        const alertMessage = document.getElementById('alert-message');
+        const alertOkBtn = document.getElementById('alert-ok-btn');
+        const passwordModal = document.getElementById('password-modal');
+        const adminPasswordInput = document.getElementById('admin-password-input');
+        const passwordSubmitBtn = document.getElementById('password-submit-btn');
+        const passwordCancelBtn = document.getElementById('password-cancel-btn');
+        const pdfLoadingModal = document.getElementById('pdf-loading-modal');
+        const confirmDeleteModal = document.getElementById('confirm-delete-modal');
+        const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
+        const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
+        let deleteId = null;
+        let isDeletingReport = false;
+
+        // --- Admin Authentication ---
+        // IMPORTANT: The password is hardcoded here.
+        // For a real-world application, use a secure backend authentication system.
+        const adminPassword = "admin010";
+
+        // --- Core Functions ---
+
+        /** Updates the real-time clock */
+        function updateClock() {
+            const now = new Date();
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', timeZoneName: 'short' };
+            realTimeClock.textContent = now.toLocaleDateString('id-ID', options);
+        }
+        
+        /** Populates the year dropdown for reports */
+        function populateYearSelect() {
+            const years = reportData.map(r => r.year).sort((a, b) => b - a);
+            const yearOptions = years.map(year => `<option value="${year}">${year}</option>`).join('');
+            yearSelect.innerHTML = `<option value="" disabled selected>-- Pilih tahun untuk melihat laporan --</option>${yearOptions}`;
+            
+            // For the report add/edit modal, populate with recent years
+            const currentYear = new Date().getFullYear();
+            const yearSelectModal = document.getElementById('report-year');
+            yearSelectModal.innerHTML = '';
+            for (let i = currentYear; i >= 2000; i--) {
+                 const existingReport = reportData.find(r => r.year === i);
+                 if (!existingReport) {
+                     const option = document.createElement('option');
+                     option.value = i;
+                     option.textContent = i;
+                     yearSelectModal.appendChild(option);
+                 }
+             }
+        }
+
+        /** Generates a real-time report based on the selected year */
+        function generateReport(year) {
+            const report = reportData.find(r => r.year == year);
+            if (!report) {
+                reportContainer.innerHTML = `<p class="text-center text-gray-500 text-lg">Tidak ada data tersedia untuk tahun ${year}.</p>`;
+                document.getElementById('report-action-buttons').classList.add('hidden');
+                return;
+            }
+            
+            document.getElementById('report-action-buttons').classList.remove('hidden');
+
+            reportContainer.innerHTML = `
+                <div class="mb-6 print-header text-center">
+                    <h1 class="text-2xl font-bold text-primary">Laporan Tahunan RT.010 RW.04</h1>
+                    <p class="text-lg font-medium text-gray-700">Kampung Baru Sukabumi Selatan Kebon Jeruk Jakarta Barat</p>
+                    <p class="text-lg font-medium text-gray-700">Tahun ${report.year}</p>
+                </div>
+                <div>
+                    <h2 class="text-xl font-bold mb-4 text-gray-700">Data Demografi</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                        <div class="flex flex-col justify-center items-center bg-white p-4 rounded-lg shadow-sm text-center border">
+                            <span class="text-gray-700">Total Penduduk</span>
+                            <span class="font-bold text-lg text-blue-600">${report.totalPenduduk}</span>
+                        </div>
+                        <div class="flex flex-col justify-center items-center bg-white p-4 rounded-lg shadow-sm text-center border">
+                            <span class="text-gray-700">Total Kepala Keluarga</span>
+                            <span class="font-bold text-lg text-blue-600">${report.totalKK}</span>
+                        </div>
+                        <div class="flex flex-col justify-center items-center bg-white p-4 rounded-lg shadow-sm text-center border">
+                            <span class="text-gray-700">Jumlah Laki-laki</span>
+                            <span class="font-bold text-lg text-blue-600">${report.lakiLaki}</span>
+                        </div>
+                        <div class="flex flex-col justify-center items-center bg-white p-4 rounded-lg shadow-sm text-center border">
+                            <span class="text-gray-700">Jumlah Perempuan</span>
+                            <span class="font-bold text-lg text-blue-600">${report.perempuan}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        /** Generates PDF for the current report */
+        function handleExportReportPDF() {
+            const selectedYear = yearSelect.value;
+            const report = reportData.find(r => r.year == selectedYear);
+            if (!report) {
+                showAlert("Pilih tahun laporan yang valid untuk diekspor.");
+                return;
+            }
+            
+            pdfLoadingModal.classList.remove('hidden');
+
+            const reportContent = document.createElement('div');
+            reportContent.innerHTML = `
+                <div class="p-8">
+                    <style>
+                        .pdf-header { text-align: center; margin-bottom: 20px; }
+                        .pdf-header h1 { font-size: 24px; font-weight: bold; }
+                        .pdf-header p { font-size: 16px; margin-top: 5px; }
+                        .report-stats-container { display: flex; flex-wrap: wrap; justify-content: space-around; }
+                        .report-stat { padding: 10px; margin: 5px; text-align: center; border: 1px solid #ccc; border-radius: 8px; flex: 1; min-width: 150px; }
+                        .report-stat-label { font-size: 14px; color: #555; }
+                        .report-stat-value { font-size: 20px; font-weight: bold; color: #1e3a8a; }
+                    </style>
+                    <div class="pdf-header">
+                        <h1>Laporan Tahunan RT.010</h1>
+                        <p>Data Penduduk Tahun ${report.year}</p>
+                    </div>
+                    <div class="report-stats-container">
+                        <div class="report-stat">
+                            <p class="report-stat-label">Total Penduduk</p>
+                            <p class="report-stat-value">${report.totalPenduduk}</p>
+                        </div>
+                        <div class="report-stat">
+                            <p class="report-stat-label">Total KK</p>
+                            <p class="report-stat-value">${report.totalKK}</p>
+                        </div>
+                        <div class="report-stat">
+                            <p class="report-stat-label">Laki-laki</p>
+                            <p class="report-stat-value">${report.lakiLaki}</p>
+                        </div>
+                        <div class="report-stat">
+                            <p class="report-stat-label">Perempuan</p>
+                            <p class="report-stat-value">${report.perempuan}</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            html2pdf(reportContent, {
+                margin: 10,
+                filename: `Laporan_Tahunan_RT_010_${selectedYear}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            }).then(() => {
+                pdfLoadingModal.classList.add('hidden');
+            });
+        }
+
+        /** Shows the page based on the target ID */
+        function showPage(targetId) {
+            pageSections.forEach(section => {
+                section.style.display = 'none';
+            });
+            document.getElementById(targetId).style.display = 'block';
+            if (targetId === 'admin-dashboard') {
+                renderAdminTable();
+                renderAdminReportsTable();
+            } else if (targetId === 'laporan') {
+                document.getElementById('report-action-buttons').classList.add('hidden');
+                reportContainer.innerHTML = `<p class="text-center text-gray-500 text-lg">Pilih tahun dari menu di atas untuk menampilkan laporan tahunan.</p>`;
+            }
+            mobileMenu.classList.add('hidden');
+        }
+        
+        /** Sorts data: Kepala Keluarga on top, followed by KK number order */
+        function sortData(data) {
+            return data.sort((a, b) => {
+                const isA_KK = a.statusHubungan === "Kepala Keluarga";
+                const isB_KK = b.statusHubungan === "Kepala Keluarga";
+                if (isA_KK && !isB_KK) return -1;
+                if (!isA_KK && isB_KK) return 1;
+                return a.kk.localeCompare(b.kk);
+            });
+        }
+
+        /** Renders the resident data table for public view */
+        function renderTable(data, tableBody) {
+            tableBody.innerHTML = '';
+            const sortedData = sortData(data);
+            const start = (currentPage - 1) * rowsPerPage;
+            const end = start + rowsPerPage;
+            const paginatedData = sortedData.slice(start, end);
+
+            paginatedData.forEach((item, index) => {
+                const row = document.createElement('tr');
+                row.className = `border-b ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`;
+                row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap">${start + index + 1}</td>
+                    <td class="px-6 py-4">${item.kk}</td>
+                    <td class="px-6 py-4">${item.nama}</td>
+                    <td class="px-6 py-4">${item.nik}</td>
+                    <td class="px-6 py-4">${item.alamat}</td>
+                    <td class="px-6 py-4">${item.gender}</td>
+                    <td class="px-6 py-4">${item.statusHubungan}</td>
+                    <td class="px-6 py-4">${item.created_at || 'N/A'}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+        
+        /** Renders pagination buttons */
+        function renderPagination(data) {
+            paginationContainer.innerHTML = '';
+            const totalPages = Math.ceil(data.length / rowsPerPage);
+
+            for (let i = 1; i <= totalPages; i++) {
+                const btn = document.createElement('button');
+                btn.textContent = i;
+                btn.className = `px-4 py-2 rounded-lg font-semibold transition-colors duration-200 ${i === currentPage ? 'bg-primary text-white' : 'bg-gray-300 text-gray-700 hover:bg-gray-400'}`;
+                btn.addEventListener('click', () => {
+                    currentPage = i;
+                    renderTable(filteredData, pendudukTableBody);
+                    renderPagination(filteredData);
+                });
+                paginationContainer.appendChild(btn);
+            }
+        }
+
+        /** Handles search and table filtering */
+        function handleSearch() {
+            const searchTerm = searchInput.value.toLowerCase();
+            filteredData = pendudukData.filter(p =>
+                p.nama.toLowerCase().includes(searchTerm) ||
+                p.nik.includes(searchTerm)
+            );
+            currentPage = 1;
+            renderTable(filteredData, pendudukTableBody);
+            renderPagination(filteredData);
+        }
+
+        /** Renders the admin table with CRUD buttons */
+        function renderAdminTable() {
+            adminTableBody.innerHTML = '';
+            const sortedData = sortData(pendudukData);
+            sortedData.forEach((item, index) => {
+                const row = document.createElement('tr');
+                row.className = 'border-b bg-white hover:bg-gray-50';
+                row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap">${index + 1}</td>
+                    <td class="px-6 py-4">${item.kk}</td>
+                    <td class="px-6 py-4">${item.nama}</td>
+                    <td class="px-6 py-4">${item.nik}</td>
+                    <td class="px-6 py-4">${item.alamat}</td>
+                    <td class="px-6 py-4">${item.gender}</td>
+                    <td class="px-6 py-4">${item.statusHubungan}</td>
+                    <td class="px-6 py-4">${item.created_at || 'N/A'}</td>
+                    <td class="px-6 py-4 text-sm font-medium">
+                        <button class="edit-btn text-blue-600 hover:text-blue-900 mr-2" data-id="${item.id}">Edit</button>
+                        <button class="delete-btn text-red-600 hover:text-red-900" data-id="${item.id}">Hapus</button>
+                    </td>
+                `;
+                adminTableBody.appendChild(row);
+            });
+        }
+
+        /** Renders the admin reports table with CRUD buttons */
+        function renderAdminReportsTable() {
+            adminReportsTableBody.innerHTML = '';
+            reportData.sort((a, b) => b.year - a.year);
+            reportData.forEach((item) => {
+                const row = document.createElement('tr');
+                row.className = 'border-b bg-white hover:bg-gray-50';
+                row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap">${item.year}</td>
+                    <td class="px-6 py-4">${item.totalPenduduk}</td>
+                    <td class="px-6 py-4">${item.totalKK}</td>
+                    <td class="px-6 py-4">${item.lakiLaki}</td>
+                    <td class="px-6 py-4">${item.perempuan}</td>
+                    <td class="px-6 py-4 text-sm font-medium">
+                        <button class="edit-report-btn text-blue-600 hover:text-blue-900 mr-2" data-year="${item.year}">Edit</button>
+                        <button class="delete-report-btn text-red-600 hover:text-red-900" data-year="${item.year}">Hapus</button>
+                    </td>
+                `;
+                adminReportsTableBody.appendChild(row);
+            });
+        }
+        
+        /** Updates the home page statistics */
+        function updateHomeStats() {
+            const totalPenduduk = pendudukData.length;
+            const totalKK = new Set(pendudukData.map(p => p.kk)).size;
+            const lakiLaki = pendudukData.filter(p => p.gender === 'Laki-laki').length;
+            const perempuan = pendudukData.filter(p => p.gender === 'Perempuan').length;
+
+            document.getElementById('total-penduduk-stat').textContent = totalPenduduk;
+            document.getElementById('total-kk-stat').textContent = totalKK;
+            document.getElementById('laki-laki-stat').textContent = lakiLaki;
+            document.getElementById('perempuan-stat').textContent = perempuan;
+        }
+        
+        /** Shows the custom alert modal */
+        function showAlert(message) {
+            alertMessage.textContent = message;
+            customAlert.classList.remove('hidden');
+        }
+
+        /** Handles PDF export */
+        function handleExportPDF() {
+            if (pendudukData.length === 0) {
+                showAlert('Tidak ada data penduduk untuk diekspor ke PDF.');
+                return;
+            }
+
+            pdfLoadingModal.classList.remove('hidden');
+
+            const pdfContent = document.createElement('div');
+            pdfContent.className = 'p-8';
+            pdfContent.innerHTML = `
+                <style>
+                    .pdf-header { text-align: center; margin-bottom: 20px; }
+                    .pdf-header img { display: block; margin: 0 auto 10px; }
+                    .pdf-header h1 { font-size: 24px; font-weight: bold; }
+                    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                    th, td { border: 1px solid #000; padding: 8px; text-align: left; font-size: 12px; }
+                    th { background-color: #f2f2f2; }
+                </style>
+                <div class="pdf-header">
+                    <img src="https://placehold.co/60x60/f97316/ffffff?text=RT" alt="RT Logo" class="h-16 w-16 rounded-full border-2 border-accent-gold">
+                    <h1 class="text-center text-primary">Laporan Data Penduduk RT.010</h1>
+                    <p class="text-center text-gray-600">Terakhir Diperbarui: ${new Date().toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                </div>
+                <table id="pdf-table">
+                    <thead>
+                        <tr>
+                            <th>No.</th>
+                            <th>No. KK</th>
+                            <th>Nama</th>
+                            <th>NIK</th>
+                            <th>Alamat</th>
+                            <th>Jenis Kelamin</th>
+                            <th>Status Hubungan</th>
+                            <th>Tanggal Dibuat</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Data populated here -->
+                    </tbody>
+                </table>
+            `;
+
+            const tbody = pdfContent.querySelector('tbody');
+            const sortedData = sortData(pendudukData);
+            sortedData.forEach((item, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${item.kk}</td>
+                    <td>${item.nama}</td>
+                    <td>${item.nik}</td>
+                    <td>${item.alamat}</td>
+                    <td>${item.gender}</td>
+                    <td>${item.statusHubungan}</td>
+                    <td>${item.created_at || 'N/A'}</td>
+                `;
+                tbody.appendChild(row);
+            });
+
+            html2pdf(pdfContent, {
+                margin: 10,
+                filename: 'Laporan_Data_Penduduk_RT_010.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            }).then(() => {
+                pdfLoadingModal.classList.add('hidden');
+            });
+        }
+
+
+        // --- Event Listeners ---
+        document.addEventListener('DOMContentLoaded', () => {
+            pendudukData = getPendudukData();
+            reportData = getReportData();
+            filteredData = pendudukData;
+
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+            showPage('home');
+            updateHomeStats();
+            renderTable(filteredData, pendudukTableBody);
+            renderPagination(filteredData);
+            populateYearSelect();
+            setInterval(updateClock, 1000);
+        });
+
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                showPage(e.target.dataset.target);
+            });
+        });
+        
+        mobileMenuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // Search
+        searchInput.addEventListener('keyup', handleSearch);
+
+        // Login/Logout
+        loginBtn.addEventListener('click', () => { passwordModal.classList.remove('hidden'); });
+        mobileLoginBtn.addEventListener('click', () => { passwordModal.classList.remove('hidden'); });
+        logoutBtn.addEventListener('click', () => { showPage('home'); });
+
+        passwordSubmitBtn.addEventListener('click', () => {
+            if (adminPasswordInput.value === adminPassword) {
+                showPage('admin-dashboard');
+                passwordModal.classList.add('hidden');
+                adminPasswordInput.value = '';
+            } else {
+                showAlert('Kata sandi salah.');
+                adminPasswordInput.value = '';
+            }
+        });
+        passwordCancelBtn.addEventListener('click', () => {
+            passwordModal.classList.add('hidden');
+            adminPasswordInput.value = '';
+        });
+
+        // --- Resident Data CRUD Logic ---
+        addDataBtn.addEventListener('click', () => { 
+            isEditing = false;
+            currentEditId = null;
+            modalTitle.textContent = 'Tambah Data Baru';
+            form.reset();
+            formNik.disabled = false;
+            addEditModal.classList.remove('hidden');
+        });
+
+        cancelFormBtn.addEventListener('click', () => { addEditModal.classList.add('hidden'); });
+
+        // Event listener for Edit/Delete buttons on admin table
+        adminTableBody.addEventListener('click', (e) => {
+            const target = e.target;
+            const id = parseInt(target.dataset.id);
+
+            if (target.classList.contains('edit-btn')) {
+                isEditing = true;
+                currentEditId = id;
+                modalTitle.textContent = 'Edit Data Penduduk';
+                
+                const dataToEdit = pendudukData.find(p => p.id === id);
+                if (dataToEdit) {
+                    formId.value = dataToEdit.id;
+                    formNama.value = dataToEdit.nama;
+                    formNik.value = dataToEdit.nik;
+                    formKk.value = dataToEdit.kk;
+                    formAlamat.value = dataToEdit.alamat;
+                    formGender.value = dataToEdit.gender;
+                    formStatusHubungan.value = dataToEdit.statusHubungan;
+                    formNik.disabled = true;
+                    addEditModal.classList.remove('hidden');
+                }
+            }
+            if (target.classList.contains('delete-btn')) {
+                deleteId = id;
+                isDeletingReport = false;
+                confirmDeleteModal.classList.remove('hidden');
+            }
+        });
+
+        // Form submission (Add/Edit Resident Data)
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const formData = {
+                nama: formNama.value,
+                nik: formNik.value,
+                kk: formKk.value,
+                alamat: formAlamat.value,
+                gender: formGender.value,
+                statusHubungan: formStatusHubungan.value
+            };
+
+            if (formData.nik.length !== 16 || formData.kk.length !== 16) {
+                showAlert("NIK dan Nomor KK harus 16 digit angka.");
+                return;
+            }
+
+            if (isEditing) {
+                const index = pendudukData.findIndex(p => p.id === currentEditId);
+                if (index !== -1) {
+                    pendudukData[index] = { ...pendudukData[index], ...formData };
+                    showAlert('Data berhasil diperbarui.');
+                }
+            } else {
+                const nikExists = pendudukData.some(p => p.nik === formData.nik);
+                if (nikExists) {
+                    showAlert('NIK sudah terdaftar. NIK harus unik.');
+                    return;
+                }
+                const now = new Date();
+                const formattedDate = now.toLocaleString('id-ID', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit'
+                });
+                const newId = pendudukData.length > 0 ? Math.max(...pendudukData.map(p => p.id)) + 1 : 1;
+                pendudukData.push({ ...formData, id: newId, created_at: formattedDate });
+                showAlert('Data berhasil ditambahkan.');
+            }
+
+            savePendudukData(pendudukData);
+            updateHomeStats();
+            renderAdminTable();
+            addEditModal.classList.add('hidden');
+            formNik.disabled = false;
+            
+            filteredData = pendudukData;
+            currentPage = 1;
+            renderTable(filteredData, pendudukTableBody);
+            renderPagination(filteredData);
+        });
+
+
+        // --- Report CRUD Logic ---
+        addReportBtn.addEventListener('click', () => { 
+            reportForm.reset();
+            populateYearSelect(); // Re-populate to show available years
+            document.getElementById('report-year').disabled = false;
+            document.getElementById('report-modal-title').textContent = 'Tambah Laporan Tahunan';
+            reportModal.classList.remove('hidden');
+        });
+
+        cancelReportBtn.addEventListener('click', () => { reportModal.classList.add('hidden'); });
+
+        // Event listener for Edit/Delete buttons on admin report table
+        adminReportsTableBody.addEventListener('click', (e) => {
+            const target = e.target;
+            const year = parseInt(target.dataset.year);
+
+            if (target.classList.contains('edit-report-btn')) {
+                const reportToEdit = reportData.find(r => r.year === year);
+                if (reportToEdit) {
+                    // Populate modal fields
+                    document.getElementById('report-year').innerHTML = `<option value="${reportToEdit.year}">${reportToEdit.year}</option>`;
+                    document.getElementById('report-year').disabled = true;
+                    document.getElementById('report-total-penduduk').value = reportToEdit.totalPenduduk;
+                    document.getElementById('report-total-kk').value = reportToEdit.totalKK;
+                    document.getElementById('report-laki-laki').value = reportToEdit.lakiLaki;
+                    document.getElementById('report-perempuan').value = reportToEdit.perempuan;
+                    
+                    document.getElementById('report-modal-title').textContent = `Edit Laporan Tahun ${year}`;
+                    reportModal.classList.remove('hidden');
+                }
+            } else if (target.classList.contains('delete-report-btn')) {
+                deleteId = year;
+                isDeletingReport = true;
+                confirmDeleteModal.classList.remove('hidden');
+            }
+        });
+        
+        // Report form submission (Add/Edit)
+        reportForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const reportYear = parseInt(document.getElementById('report-year').value);
+            const reportToUpdate = reportData.find(r => r.year === reportYear);
+            
+            if (reportToUpdate) {
+                // Edit existing report
+                reportToUpdate.totalPenduduk = parseInt(document.getElementById('report-total-penduduk').value);
+                reportToUpdate.totalKK = parseInt(document.getElementById('report-total-kk').value);
+                reportToUpdate.lakiLaki = parseInt(document.getElementById('report-laki-laki').value);
+                reportToUpdate.perempuan = parseInt(document.getElementById('report-perempuan').value);
+                showAlert('Laporan berhasil diperbarui.');
+            } else {
+                // Add new report
+                const newReport = {
+                    year: reportYear,
+                    totalPenduduk: parseInt(document.getElementById('report-total-penduduk').value),
+                    totalKK: parseInt(document.getElementById('report-total-kk').value),
+                    lakiLaki: parseInt(document.getElementById('report-laki-laki').value),
+                    perempuan: parseInt(document.getElementById('report-perempuan').value),
+                };
+                reportData.push(newReport);
+                showAlert('Laporan berhasil ditambahkan.');
+            }
+            saveReportData(reportData);
+            renderAdminReportsTable();
+            populateYearSelect();
+            reportModal.classList.add('hidden');
+        });
+
+        // Confirmation for delete actions
+        confirmDeleteBtn.addEventListener('click', () => {
+            if (isDeletingReport) {
+                reportData = reportData.filter(r => r.year !== deleteId);
+                saveReportData(reportData);
+                renderAdminReportsTable();
+                populateYearSelect();
+                showAlert('Laporan berhasil dihapus.');
+            } else {
+                pendudukData = pendudukData.filter(p => p.id !== deleteId);
+                savePendudukData(pendudukData);
+                updateHomeStats();
+                renderAdminTable();
+                filteredData = pendudukData;
+                currentPage = 1;
+                renderTable(filteredData, pendudukTableBody);
+                renderPagination(filteredData);
+                showAlert('Data berhasil dihapus.');
+            }
+            confirmDeleteModal.classList.add('hidden');
+            deleteId = null;
+            isDeletingReport = false;
+        });
+        
+        cancelDeleteBtn.addEventListener('click', () => {
+            confirmDeleteModal.classList.add('hidden');
+            deleteId = null;
+            isDeletingReport = false;
+        });
+
+        // Print button for resident data
+        printDataBtn.addEventListener('click', () => {
+             const dataPendudukElement = document.getElementById('data-penduduk');
+             dataPendudukElement.classList.add('print-area');
+             window.print();
+             setTimeout(() => {
+                 dataPendudukElement.classList.remove('print-area');
+             }, 100);
+        });
+
+        // Print button for reports
+        printLaporanBtn.addEventListener('click', () => {
+             const laporanElement = document.getElementById('laporan');
+             laporanElement.classList.add('print-area');
+             window.print();
+             setTimeout(() => {
+                 laporanElement.classList.remove('print-area');
+             }, 100);
+        });
+        
+        // PDF Export button (only for resident data)
+        exportPdfBtn.addEventListener('click', handleExportPDF);
+        
+        // PDF Export button for reports
+        exportReportBtn.addEventListener('click', handleExportReportPDF);
+
+        // Report year select change event
+        yearSelect.addEventListener('change', (event) => {
+            const selectedYear = event.target.value;
+            if (selectedYear) {
+                generateReport(selectedYear);
+            } else {
+                reportContainer.innerHTML = `<p class="text-center text-gray-500 text-lg">Pilih tahun dari menu di atas untuk menampilkan laporan tahunan.</p>`;
+                document.getElementById('report-action-buttons').classList.add('hidden');
+            }
+        });
+
+        // Close custom alert modal
+        alertOkBtn.addEventListener('click', () => {
+            customAlert.classList.add('hidden');
+        });
+    </script>
+</body>
+</html>
